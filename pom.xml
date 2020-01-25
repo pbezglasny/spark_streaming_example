@@ -26,7 +26,12 @@
             <dependency>
                 <groupId>org.scala-lang</groupId>
                 <artifactId>scala-library</artifactId>
-                <version>${scala.major.version}.10</version>
+                <version>${scala.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.scala-lang.modules</groupId>
+                <artifactId>scala-xml_${scala.major.version}</artifactId>
+                <version>1.2.0</version>
             </dependency>
             <dependency>
                 <groupId>org.json4s</groupId>

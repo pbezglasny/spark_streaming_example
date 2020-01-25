@@ -45,7 +45,7 @@ object ProducerMain {
     props.put("bootstrap.servers", "localhost:9092")
     val producer = new KafkaProducer[String, InputMessage](props, new StringSerializer(), new MessageSerializer())
     val thread = new Thread(() => {
-      for (_ <- 1 to 5) {
+      for (_ <- 1 to 1000) {
         val record = new ProducerRecord[String, InputMessage](topic, getMessage)
         val javaFuture = producer.send(record)
         Future(javaFuture.get()).onComplete {
