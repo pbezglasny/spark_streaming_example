@@ -42,7 +42,7 @@ object ProducerMain {
 
   def main(args: Array[String]): Unit = {
     val props = new Properties()
-    props.put("bootstrap.servers", "localhost:9092")
+    props.put("bootstrap.servers", "localhost:9093")
     val producer = new KafkaProducer[String, InputMessage](props, new StringSerializer(), new MessageSerializer())
     val thread = new Thread(() => {
       for (_ <- 1 to 1000) {

@@ -39,9 +39,12 @@ object ConsumerMain {
   def aggreate(df: DataFrame): DataFrame = {
     df
       .groupBy(
-        //        window(col("_time"), "5 seconds"),
+        window(col("_time"), "5 seconds"),
         col("DESTADDR"),
-        col("SMS_NUMBER")
+        col("SMS_NUMBER"),
+        col("SMS_PART"),
+        col("SMS_LEN"),
+        col("RESULT")
       ).agg(
       min("_time").as("min_time"),
       max("_time").as("max_time"),
@@ -51,16 +54,16 @@ object ConsumerMain {
   }
 
   def markerFull(df: DataFrame): DataFrame = {
-    df.withColumn("MARKER_FULL", when(col("SMS_PART") === col("LEN") &&
+    df.withColumn("MARKER_FULL", when(col("SMS_PART") === col("SMS_LEN") &&
       col("RESULT") === lit(0), 1).otherwise(0))
       //      .filter("MARKER_FULL = 1")
       .filter(col("MARKER_FULL") === lit(1))
   }
 
   def main(args: Array[String]): Unit = {
-    val spark = SparkSession.builder().master("local[2]").getOrCreate()
+    val spark = SparkSession.builder().master("local[4]").getOrCreate()
     val options = Map[String, String](
-      "kafka.bootstrap.servers" -> "localhost:9092",
+      "kafka.bootstrap.servers" -> "localhost:9093",
       "subscribe" -> "input_topic"
     )
     val df = spark.readStream.format("kafka").options(options).load().
@@ -74,8 +77,9 @@ object ConsumerMain {
       transform(decodeUrl).
       transform(aggreate).
 //      transform(markerFull).
-      writeStream.format("console").outputMode(OutputMode.Complete).
+      writeStream.format("console").outputMode(OutputMode.Complete()).
       trigger(Trigger.ProcessingTime("5 seconds")).start()
+
     query.awaitTermination()
   }
 }
